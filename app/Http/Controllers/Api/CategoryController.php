@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -14,7 +15,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+        return response()->json($categories, 200);
     }
 
     /**
@@ -25,7 +27,19 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:categories',
+        ]);
+
+        $category = new Category;
+        $category->name = $request->name;
+        $category->description = $request->description;
+        $category->save();
+
+        return response()->json([
+            'msj'   => 'Categoria Guardada',
+            'data'  => $category
+        ], 201);
     }
 
     /**
@@ -36,7 +50,15 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        $category = Category::find($id);
+        
+        if ( $category ) {
+            return response()->json($category, 200);
+        }
+
+        return response()->json([
+            'msg'   => 'Categoria no encontrada'
+        ], 404);
     }
 
     /**
@@ -48,7 +70,26 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $category = Category::find($id);
+
+        if ( $category ) {
+            $request->validate([
+                'name' => "required|unique:categories,name,$id",
+            ]);
+
+            $category->name = $request->name;
+            $category->description = $request->description;
+            $category->save();
+
+            return response()->json([
+                'msj'   => 'Categoria Modificada', 
+                'data'  => $category
+            ], 200);
+        }
+
+        return response()->json([
+            'msj'   => 'Categoria no encontrada'
+        ], 404);
     }
 
     /**
@@ -59,6 +100,18 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::find($id);
+
+        if ( $category ) {
+            $category->delete();            
+
+            return response()->json([
+                'msj'   => 'Categoria Eliminada'
+            ], 200);
+        }
+
+        return response()->json([
+            'msj' => 'Categoria no encontrada'
+        ], 404);
     }
 }
