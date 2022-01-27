@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ItemController;
@@ -27,3 +28,11 @@ Route::apiResource('categories', CategoryController::class);
 Route::apiResource('customers', CustomerController::class);
 Route::apiResource('items', ItemController::class);
 Route::apiResource('orders', OrderController::class);
+
+
+Route::group([ 'middleware' => 'api', 'prefix' => 'auth'], function() {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::post('me', [AuthController::class, 'me']);
+});     
